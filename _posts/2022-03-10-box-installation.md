@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "2nd step to own Nextcloud"
+title:  "The 2nd step to own Nextcloud"
 description: "Box installation"
 categories: raspberry-pi box
 permalink: "/raspberry-pi/box-installation/"
@@ -8,7 +8,7 @@ permalink: "/raspberry-pi/box-installation/"
 # Box installation
 
 > Prerequisites
-- [Order devices and facilities](../order/)
+- [Order devices and facilities]({% post_url 2022-03-9-order %})
 
 Prepare all items from the order: charger, box, fan, board, ssd and Raspberry Pi like we can see in the following image.
 ![order](/assets/images/unpacked_order.jpg)
@@ -48,4 +48,4 @@ We could check the final setup on the following photos.
 ![Box back view](/assets/images/box_back.jpg)
 ![Box left view](/assets/images/box_left.jpg)
 
-> Following [post](../installation/) is about Raspberry Pi installation.
+> Following [post]({% post_url 2022-03-11-raspberry-pi-installation %}) is about Raspberry Pi installation.

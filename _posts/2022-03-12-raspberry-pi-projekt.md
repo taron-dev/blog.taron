@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "4th step to own Nextcloud"
+title:  "The 4th step to own Nextcloud"
 description: "Finish box installation and setup Nextcloud"
 categories: raspberry-pi
 permalink: "/raspberry-pi/nextcloud/"
@@ -8,9 +8,9 @@ permalink: "/raspberry-pi/nextcloud/"
 # Finish box installation and setup Nextcloud
 
 > Prerequisites
-- [Order devices and facilities](../order/)
-- [Installation all devices and facilities to the X825 V2.0 board](../box-installation/)
-- [Installation and verification of Raspberry Pi device](../installation/)
+- [Order devices and facilities]({% post_url 2022-03-9-order %})
+- [Installation all devices and facilities to the X825 V2.0 board]({% post_url 2022-03-10-box-installation %})
+- [Installation and verification of Raspberry Pi device]({% post_url 2022-03-11-raspberry-pi-installation %})
 
 ### Setup X735 board with raspberry pi, case and fan.
 
