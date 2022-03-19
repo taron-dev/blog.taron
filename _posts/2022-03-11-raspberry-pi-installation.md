@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "3rd step to own Nextcloud"
+title:  "The 3rd step to own Nextcloud"
 description: "Raspberry Pi installation"
 categories: raspberry-pi installatiion
 permalink: "/raspberry-pi/installation/"
@@ -8,8 +8,8 @@ permalink: "/raspberry-pi/installation/"
 # Raspberry Pi installation
 
 > Prerequisites
-- [Order devices and facilities](../order/)
-- [Installation all devices and facilities to the X825 V2.0 board](../box-installation/)
+- [Order devices and facilities]({% post_url 2022-03-9-order %})
+- [Installation all devices and facilities to the X825 V2.0 board]({% post_url 2022-03-10-box-installation %})
 
 Before putting all things together I recommend to verify the Raspberry Pi if it works as expected. Check all ports, connection to the network etc.
 
@@ -35,4 +35,4 @@ Install tmux to secure managing server via storing session.
 sudo apt install tmux
 # type tmux to activate
 ```
-> Following [post](../nextcloud/) is about finishing box installation and setup Nextcloud.
+> Following [post]({% post_url 2022-03-12-raspberry-pi-projekt %}) is about finishing box installation and setup Nextcloud.
