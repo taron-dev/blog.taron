@@ -3,7 +3,7 @@ author:
   name: taron
   email: taron-dev@taron.sk
 description: > # this means to ignore newlines until "show_excerpts:"
-  Posts related to wide range of topics, but mainly to technology and especially IT world.
+  Posts from wide range of topics, but mainly technology and especially IT world.
 
 baseurl: "/blog.taron" # the subpath of your site, e.g. /blog
 #url: "https://taron-dev.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
