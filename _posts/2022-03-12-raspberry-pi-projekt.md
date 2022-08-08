@@ -80,7 +80,7 @@ reboot
 
 ### Setup data folder
 
-The main purpose of the disk connected to the board is data storage for our Nextcloud. I created the `nextcloud_data` folder on the disk as the root folder for our Nextcloud data.
+The main purpose of the disk connected to the board is data storage for our Nextcloud. For example create the `nextcloud_data` folder on the disk as the root folder for our Nextcloud data.
 
 Important thing is to update owner of this folder to `www-data` via:
 ```sh
