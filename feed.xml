@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/blog.taron/feed.xml" rel="self" type="application/atom+xml" /><link href="/blog.taron/" rel="alternate" type="text/html" /><updated>2022-08-08T07:12:17+00:00</updated><id>/blog.taron/feed.xml</id><title type="html">blog.taron</title><subtitle>Posts from wide range of topics, but mainly technology and especially IT world.
+</subtitle><author><name>taron</name><email>taron-dev@taron.sk</email></author><entry><title type="html">The 4th step to own Nextcloud</title><link href="/blog.taron/raspberry-pi/nextcloud/" rel="alternate" type="text/html" title="The 4th step to own Nextcloud" /><published>2022-03-12T00:00:00+00:00</published><updated>2022-03-12T00:00:00+00:00</updated><id>/blog.taron/raspberry-pi/raspberry-pi-projekt</id><content type="html" xml:base="/blog.taron/raspberry-pi/nextcloud/"><![CDATA[<h1 id="finish-box-installation-and-setup-nextcloud">Finish box installation and setup Nextcloud</h1>
+
+<blockquote>
+  <p>Prerequisites</p>
+  <ul>
+    <li><a href="/blog.taron/raspberry-pi/order/">Order devices and facilities</a></li>
+    <li><a href="/blog.taron/raspberry-pi/box-installation/">Installation all devices and facilities to the X825 V2.0 board</a></li>
+    <li><a href="/blog.taron/raspberry-pi/installation/">Installation and verification of Raspberry Pi device</a></li>
+  </ul>
+</blockquote>
+
+<h3 id="setup-x735-board-with-raspberry-pi-case-and-fan">Setup X735 board with raspberry pi, case and fan</h3>
+
+<p>In order to run PWN fan on X735 we need to run <a href="https://wiki.geekworm.com/X735_V2.5_Software">shell script</a>.</p>
+
+<blockquote>
+  <p>Tip: Latest version of Rasppbian comes with v3 of python. This requires us to run python commands with <code class="language-plaintext highlighter-rouge">python3</code> instead of <code class="language-plaintext highlighter-rouge">python</code>.</p>
+</blockquote>
+
+<h3 id="setup-raspberry-pi-to-mount-disk-always-on-boot">Setup Raspberry Pi to mount disk always on boot</h3>
+<p>List disk, partitions and mount points.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lsblk
+</code></pre></div></div>
+<p>For example <code class="language-plaintext highlighter-rouge">sda</code> has type disk and no mount point.</p>
+
+<p>Verify if <code class="language-plaintext highlighter-rouge">parted</code> is already installed.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>which parted
+
+<span class="c"># in case of not installed parted type</span>
+<span class="nb">sudo </span>apt <span class="nb">install </span>parted
+</code></pre></div></div>
+
+<p>Set disk label type.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>parted /dev/sda mklabel gpt
+</code></pre></div></div>
+
+<p>Create partition type ext4 on disk <code class="language-plaintext highlighter-rouge">/dev/sda</code> 100% size of disk capacity.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>parted <span class="nt">-a</span> opt /dev/sda mkpart primary ext4 0% 100%
+</code></pre></div></div>
+
+<p>Format partition on path <code class="language-plaintext highlighter-rouge">/dev/sda1</code> with tool <code class="language-plaintext highlighter-rouge">mkfs.ext4</code> and name it (in my case kingstonepartition).</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>mkfs.ext4 <span class="nt">-L</span> kingstonepartition /dev/sda1
+</code></pre></div></div>
+
+<p>Create folder for mount point in <code class="language-plaintext highlighter-rouge">/mnt/kingstonedata</code> path.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo mkdir</span> <span class="nt">-p</span> /mnt/kingstonedata
+</code></pre></div></div>
+
+<p>Get <code class="language-plaintext highlighter-rouge">partuuid</code> from:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>blkid
+</code></pre></div></div>
+
+<p>Open <code class="language-plaintext highlighter-rouge">fstab</code> file.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>nano /etc/fstab
+</code></pre></div></div>
+
+<p>In order to mount the disk automatically during start up add line like this to <code class="language-plaintext highlighter-rouge">fstab</code> with partition path, label and UUID of <code class="language-plaintext highlighter-rouge">/dev/sda1</code>:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">LABEL</span><span class="o">=</span><span class="s2">"kingstonepartiti"</span> <span class="nv">UUID</span><span class="o">=</span><span class="s2">"5ecdfe5d-1a23-4662-adfe-b59bb73aff3e"</span> <span class="nv">BLOCK_SIZE</span><span class="o">=</span><span class="s2">"4096"</span> <span class="nv">TYPE</span><span class="o">=</span><span class="s2">"ext4"</span> <span class="nv">PARTLABEL</span><span class="o">=</span><span class="s2">"primary"</span> <span class="nv">PARTUUID</span><span class="o">=</span><span class="s2">"3bdd15b9-6386-4a4f-9103-c7a98ab951f5"</span>
+</code></pre></div></div>
+
+<p>Mount all file-systems mentioned in <code class="language-plaintext highlighter-rouge">fstab</code>.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>mount <span class="nt">-a</span>
+</code></pre></div></div>
+
+<p>In the end reboot machine.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>reboot
+</code></pre></div></div>
+
+<h3 id="setup-data-folder">Setup data folder</h3>
+
+<p>The main purpose of the disk connected to the board is data storage for our Nextcloud. For example create the <code class="language-plaintext highlighter-rouge">nextcloud_data</code> folder on the disk as the root folder for our Nextcloud data.</p>
+
+<p>Important thing is to update owner of this folder to <code class="language-plaintext highlighter-rouge">www-data</code> via:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo chown</span> <span class="nt">-R</span> www-data:www-data /mnt/kingstonedata/nextcloud_data
+</code></pre></div></div>
+<p>When we will go through Nextcloud web setup we will set the <code class="language-plaintext highlighter-rouge">/mnt/kingstonedata/nextcloud_data</code> as the data folder used by Nextcloud.</p>
+
+<h2 id="nextcloud">Nextcloud</h2>
+
+<p>Start tmux session with <code class="language-plaintext highlighter-rouge">tmux</code> command.
+Verify if wget is installed:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>which wget
+<span class="c"># Output similar to</span>
+/usr/bin/wget
+
+<span class="c"># in case of not installed wget type</span>
+<span class="nb">sudo </span>apt <span class="nb">install </span>wget
+</code></pre></div></div>
+
+<p>Download and unzip Nextcloud with wget</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip
+unzip nextcloud-23.0.0.zip
+</code></pre></div></div>
+
+<p>There is blog post <a href="https://www.learnlinux.tv/nextcloud-complete-setup-guide/">https://www.learnlinux.tv/nextcloud-complete-setup-guide/</a> and related video <a href="https://www.youtube.com/watch?v=y4dtcr2NL5M">https://www.youtube.com/watch?v=y4dtcr2NL5M</a> which contains all needed commands and almost all steps in order to install Nextcloud on Raspberry Pi. Before we will setup the Nextcloud, we want to configure the data folder.</p>]]></content><author><name>taron</name><email>taron-dev@taron.sk</email></author><category term="raspberry-pi" /><summary type="html"><![CDATA[Finish box installation and setup Nextcloud]]></summary></entry><entry><title type="html">The 3rd step to own Nextcloud</title><link href="/blog.taron/raspberry-pi/installation/" rel="alternate" type="text/html" title="The 3rd step to own Nextcloud" /><published>2022-03-11T00:00:00+00:00</published><updated>2022-03-11T00:00:00+00:00</updated><id>/blog.taron/raspberry-pi/raspberry-pi-installation</id><content type="html" xml:base="/blog.taron/raspberry-pi/installation/"><![CDATA[<h1 id="raspberry-pi-installation">Raspberry Pi installation</h1>
+
+<blockquote>
+  <p>Prerequisites</p>
+  <ul>
+    <li><a href="/blog.taron/raspberry-pi/order/">Order devices and facilities</a></li>
+    <li><a href="/blog.taron/raspberry-pi/box-installation/">Installation all devices and facilities to the X825 V2.0 board</a></li>
+  </ul>
+</blockquote>
+
+<p>Before putting all things together I recommend to verify the Raspberry Pi if it works as expected. Check all ports, connection to the network, etc.</p>
+
+<ol>
+  <li>Burn OS(Lite 64bit) to SD card via <code class="language-plaintext highlighter-rouge">Raspberry Pi Imager</code> program. Add empty <code class="language-plaintext highlighter-rouge">ssh</code> file to boot partition in order to SSH connection when the Raspberry Pi is started.</li>
+  <li>Plug in SD card, wired internet and power (USB-C).</li>
+  <li>Log into router and wait until we see <code class="language-plaintext highlighter-rouge">raspberry</code> between connected devices. Copy the IP address of the device. We will need it for connection to device.
+    <ul>
+      <li>Optional (but recommended) step: Reserve IP address for the Raspberry Pi’s MAC address. The MAC address reservation allows us to use the same IP address even when we will reinstall the Raspberry Pi OS, or after some restart or electricity outage.</li>
+    </ul>
+  </li>
+  <li>Connect to Raspberry Pi via <code class="language-plaintext highlighter-rouge">ssh</code> command with user <em>pi</em> and password <em>raspberry</em>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh pi@&lt;ip_addre&gt; <span class="c"># e.g. ssh pi@192.168.0.111</span>
+</code></pre></div>    </div>
+    <p>Make sure the device is up to date with the latest updates.</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>apt dist-upgrade
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Now we can play a bit with the device, check ports and have a fun.</p>
+
+<h3 id="tmux-tool-optional">Tmux tool (Optional)</h3>
+
+<p>Install tmux to secure managing server via storing session.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>tmux
+<span class="c"># type tmux to activate</span>
+</code></pre></div></div>
+<blockquote>
+  <p>Following <a href="/blog.taron/raspberry-pi/nextcloud/">post</a> is about finishing box installation and setup Nextcloud.</p>
+</blockquote>]]></content><author><name>taron</name><email>taron-dev@taron.sk</email></author><category term="raspberry-pi" /><category term="installatiion" /><summary type="html"><![CDATA[Raspberry Pi installation]]></summary></entry><entry><title type="html">The 2nd step to own Nextcloud</title><link href="/blog.taron/raspberry-pi/box-installation/" rel="alternate" type="text/html" title="The 2nd step to own Nextcloud" /><published>2022-03-10T00:00:00+00:00</published><updated>2022-03-10T00:00:00+00:00</updated><id>/blog.taron/raspberry-pi/box-installation</id><content type="html" xml:base="/blog.taron/raspberry-pi/box-installation/"><![CDATA[<h1 id="box-installation">Box installation</h1>
+
+<blockquote>
+  <p>Prerequisites</p>
+  <ul>
+    <li><a href="/blog.taron/raspberry-pi/order/">Order devices and facilities</a></li>
+  </ul>
+</blockquote>
+
+<p>Prepare all items from the order: charger, box, fan, board, SSD disk and Raspberry Pi like we can see in the following image.
+<img src="/blog.taron/assets/images/unpacked_order.jpg" alt="order" /></p>
+
+<p>For the first steps we will need board, SSD disk, screws and Raspberry Pi. Other things we put aside for now.
+<img src="/blog.taron/assets/images/raspberry_board_screws_ssd.jpg" alt="Raspberrz Pi, X825 board, screws and SSD disk" /></p>
+
+<p>As the first step we will connect the X825 board with SSD disk.
+<img src="/blog.taron/assets/images/board_and_ssd.jpg" alt="X825 board and SSD disk" /></p>
+
+<p>Insert the SSD disk to the SATA port on the bottom side of the X825 board and use two screws to fix the SSD disk from the top of the X825 board. The following image shows the mounted SSD disk to X825 board form the bottom.
+<img src="/blog.taron/assets/images/board_mounted_ssd.jpg" alt="Mounted SSD disk with X825 board" /></p>
+
+<p>Use another four screws to fix the Raspberry Pi on top of the X825 board like in two following photos, if we want to play a bit with this setup. If not, just put the Raspberry Pi on top of the board.
+<img src="/blog.taron/assets/images/mounted_board_ssd_raspberry.jpg" alt="Mounted X825 board, SSD disk and Raspberry Pi" />
+<img src="/blog.taron/assets/images/mounted_board_ssd_raspberry_side.jpg" alt="Side view of mounted X825 board, SSD disk and Raspberry Pi" /></p>
+
+<p>Prepare fan, screws and spacer nuts.
+<img src="/blog.taron/assets/images/fan_screws_spacer_nuts_raspbery.jpg" alt="Fan, screws, spacer nuts and Raspberry Pi" /></p>
+
+<p>Use spacer nuts to fix the Raspberry Pi and make space for placing fan on top of the spacer nuts. Do not forget to fix the fan with spacer nuts. Result should be similar to the following photo.
+<img src="/blog.taron/assets/images/mounted_fan_screws_spacer_nuts_raspbery_front.jpg" alt="Mouunted fan, screws, spacer nuts and Raspberry Pi" /></p>
+
+<p>It is time to open the box. We will find, like in the following picture, the small fan (which we will not need) and the button to turn on/off, or restart the device.
+<img src="/blog.taron/assets/images/box_content.jpg" alt="Box content" /></p>
+
+<p>Place carefully our setup into the box and fix it with screws from the bottom.
+<img src="/blog.taron/assets/images/mounted_raspberry_in_box.jpg" alt="Mounted setup in the box" /></p>
+
+<p>Do not forget to install the button to be able to control the device. For this, check the installation video from <a href="https://www.youtube.com/watch?v=JxUNhIxXgj4">manofacturer</a> or more detailed one from <a href="https://www.youtube.com/watch?v=uh1_05AZmzI">DB Tech</a>.</p>
+
+<p>Cover the setup with lid and fix the box with screws. Do not forget to connect <code class="language-plaintext highlighter-rouge">X825 board</code> with the Raspberry Pi via USB interconnector.</p>
+
+<p>We could check the final setup in the following photos.
+<img src="/blog.taron/assets/images/box_front.jpg" alt="Box front view" />
+<img src="/blog.taron/assets/images/box_right.jpg" alt="Box right view" />
+<img src="/blog.taron/assets/images/box_back.jpg" alt="Box back view" />
+<img src="/blog.taron/assets/images/box_left.jpg" alt="Box left view" /></p>
+
+<blockquote>
+  <p>Following <a href="/blog.taron/raspberry-pi/installation/">post</a> is about Raspberry Pi installation.</p>
+</blockquote>]]></content><author><name>taron</name><email>taron-dev@taron.sk</email></author><category term="raspberry-pi" /><category term="box" /><summary type="html"><![CDATA[Box installation]]></summary></entry><entry><title type="html">The 1st step to own Nextcloud</title><link href="/blog.taron/raspberry-pi/order/" rel="alternate" type="text/html" title="The 1st step to own Nextcloud" /><published>2022-03-09T00:00:00+00:00</published><updated>2022-03-09T00:00:00+00:00</updated><id>/blog.taron/raspberry-pi/order</id><content type="html" xml:base="/blog.taron/raspberry-pi/order/"><![CDATA[<h1 id="order-necessary-devices-and-facilities">Order necessary devices and facilities</h1>
+
+<p>Here is the list of devices and facilites used for selfhosted Nextcloud: Raspberry Pi, charger, SD card, box, board, SSD disk and fan.</p>
+
+<p>Order: <img src="/blog.taron/assets/images/packed_order.jpg" alt="packed order" /></p>
+
+<p>Unpacked order: <img src="/blog.taron/assets/images/unpacked_order.jpg" alt="unpacked order" /></p>
+
+<p>We will need:</p>
+<ol>
+  <li>Raspberry Pi computer (recommended at least 2GB). Ordered from <a href="https://rpishop.cz/raspberry-pi-4b/1599-raspberry-pi-4-model-b-2gb-ram-765756931175.html">rpishop.cz</a>.</li>
+  <li>Charger. Ordered official charger from <a href="https://rpishop.cz/zdroje/1595-OFI045.html">rpishop.cz</a>.</li>
+  <li>Metal case for the Raspberry, disk and fan <code class="language-plaintext highlighter-rouge">Geekworm X825-C8 (X825 V2.0)</code>. Ordered from <a href="https://www.amazon.de/gp/product/B09295FHBW/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;psc=1">Amazon</a>.</li>
+  <li>Expansion board <code class="language-plaintext highlighter-rouge">Geekworm Raspberry Pi 4 SATA X825 V2.0</code>. It serves to connect disk with Raspberry and on/of button on metal case. Ordered from <a href="https://www.amazon.de/gp/product/B091JSRQ9C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;psc=1">Amazon</a>.</li>
+  <li>Power management and cooling fan <code class="language-plaintext highlighter-rouge">Geekworm Raspberry Pi 4 X735 V2.5</code>. Ordered from <a href="https://www.amazon.de/gp/product/B07NLR49L1/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&amp;psc=1">Amazon</a>.</li>
+  <li>2,5” SATA disk of preference. It will be connected to expansion board. Ordered 480GB SSD.</li>
+  <li>Micro SD card. In order to write there Raspberry Pi image.</li>
+</ol>
+
+<blockquote>
+  <p>Following <a href="/blog.taron/raspberry-pi/box-installation/">post</a> is about hardware installation.</p>
+</blockquote>]]></content><author><name>taron</name><email>taron-dev@taron.sk</email></author><category term="raspberry-pi" /><category term="order" /><summary type="html"><![CDATA[Order necessary devices and facilities]]></summary></entry></feed>
